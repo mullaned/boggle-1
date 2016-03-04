@@ -1,6 +1,8 @@
 import unittest
 from string import ascii_uppercase
+
 import boggle
+
 
 class test_boggle(unittest.TestCase):
     def test_can_create_an_empty_grid(self):
@@ -24,7 +26,7 @@ class test_boggle(unittest.TestCase):
             self.assertTrue(L in ascii_uppercase)
 
     def test_neighbours_of_a_position(self):
-        neighbours = boggle.neighbours_of_position(1, 2)
+        neighbours = boggle.neighbours_of_position((1, 2))
         self.assertTrue((0,1) in neighbours)
         self.assertTrue((0,2) in neighbours)
         self.assertTrue((0,3) in neighbours)
@@ -34,4 +36,14 @@ class test_boggle(unittest.TestCase):
         self.assertTrue((2,2) in neighbours)
         self.assertTrue((2,3) in neighbours)
 
+    def test_all_neighbours(self):
+        grid = boggle.make_grid(2, 2)
+        neighbours = boggle.get_neighbours(grid)
+        self.assertEquals(len(neighbours), len(grid))
+        self.assertListEqual(sorted(neighbours[(0, 0)]), sorted([(0, 1), (1, 1), (1, 0)]))
 
+    def test_search(self):
+        grid = boggle.make_grid(2, 2)
+        words = boggle.search(grid)
+        self.assertEquals(len(words), 64)
+        # self.assertEquals(len(words), len(set(words)))
