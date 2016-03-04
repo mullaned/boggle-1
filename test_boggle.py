@@ -5,6 +5,7 @@ import boggle
 
 
 class test_boggle(unittest.TestCase):
+    # Test Making a Grid
     def test_can_create_an_empty_grid(self):
         grid = boggle.make_grid(0, 0)
         self.assertEquals(len(grid), 0)
@@ -25,6 +26,7 @@ class test_boggle(unittest.TestCase):
         for L in grid.values():
             self.assertTrue(L in ascii_uppercase)
 
+    # Neighbours of an Individual Position
     def test_neighbours_of_a_position(self):
         neighbours = boggle.neighbours_of_position((1, 2))
         self.assertTrue((0,1) in neighbours)
@@ -36,14 +38,23 @@ class test_boggle(unittest.TestCase):
         self.assertTrue((2,2) in neighbours)
         self.assertTrue((2,3) in neighbours)
 
+    # All Neighbour Relationships in a Grid
     def test_all_neighbours(self):
         grid = boggle.make_grid(2, 2)
         neighbours = boggle.get_neighbours(grid)
         self.assertEquals(len(neighbours), len(grid))
         self.assertListEqual(sorted(neighbours[(0, 0)]), sorted([(0, 1), (1, 1), (1, 0)]))
 
+    # Convert a Path to a Word
+    def test_converting_a_path_to_a_word(self):
+        grid = boggle.make_grid(2, 2)
+        oneLetterWord = boggle.path_to_word(grid, [(0, 0)])
+        twoLetterWord = boggle.path_to_word(grid, [(0, 0), (1, 1)])
+        self.assertEquals(oneLetterWord, grid[(0, 0)])
+        self.assertEquals(twoLetterWord, grid[(0, 0)] + grid[(1, 1)])
+
+
     def test_search(self):
         grid = boggle.make_grid(2, 2)
         words = boggle.search(grid)
-        self.assertEquals(len(words), 64)
-        # self.assertEquals(len(words), len(set(words)))
+        self.assertEquals(len(words), len(set(words)))

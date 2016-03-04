@@ -1,5 +1,7 @@
+import time
 from random import choice
 from string import ascii_uppercase
+
 
 def make_grid(width, height):
     return {(x, y): choice(ascii_uppercase)
@@ -20,16 +22,40 @@ def get_neighbours(grid):
     for position in grid:
         position_neighbours = neighbours_of_position(position)
         neighbours[position] = [p for p in position_neighbours if p in grid]
-
     return neighbours
+
+
+def path_to_word(grid, path):
+    return ''.join([grid[p] for p in path])
+
+
+# TODO, Split loading the file, and building the Dictionary, Stems
+def get_dictionary(dictionaryFile):
+    stems, dictionary = set(), set()
+
+    with open(dictionaryFile) as f:
+        for word in f:
+            word = word.strip().upper()
+            dictionary.add(word)
+
+            for i in range(len(word)):
+                stems.add(word[:i + 1])
+
+    return dictionary, stems
 
 
 def search(grid):
     neighbours = get_neighbours(grid)
+    dictionary, stems = get_dictionary('/usr/share/dict/words')
+
     paths = []
 
     def do_search(path):
-        paths.append(path)
+        word = path_to_word(grid, path)
+        if word not in stems:
+            return
+        if word in dictionary:
+            paths.append(path)
         for next_pos in neighbours[path[-1]]:
             if next_pos not in path:
                 do_search(path + [next_pos])
@@ -39,12 +65,29 @@ def search(grid):
 
     words = []
     for path in paths:
-        words.append(''.join([grid[p] for p in path]))
+        words.append(path_to_word(grid, path))
 
-    return words
+    return set(words)
 
 
-grid = make_grid(2, 2)
-words = search(grid)
+def print_grid(grid):
+    s = ''
+    for y in range(10):
+        for x in range(10):
+            s += grid[x, y] + ' '
+        s += '\n'
+    print s
 
-print words
+
+def time_function(method):
+    t1 = time.time()
+    res = method()
+    print '%2.2f sec' % (time.time() - t1)
+    return res
+
+
+def get_words():
+    grid = make_grid(10, 10)
+    return search(grid)
+
+# get_words()
