@@ -1,12 +1,46 @@
-import time
 from random import choice
 from string import ascii_uppercase
+
+from profile import time_function
+
+
+def play_boggle():
+    grid = make_grid(20, 20)
+    dictionary = get_dictionary('/usr/share/dict/words')
+
+    words = search(grid, dictionary)
+
+    display_grid(grid)
+    display_words(words)
 
 
 def make_grid(width, height):
     return {(x, y): choice(ascii_uppercase)
             for x in range(width)
             for y in range(height)}
+
+
+def grid_as_text(grid):
+    height = max(grid)[0] + 1
+    width = max(grid)[1] + 1
+    rows = []
+    for x in range(height):
+        rows.append(' '.join([grid[x, y] for y in range(width)]))
+    return rows
+
+
+def display_grid(grid):
+    for line in grid_as_text(grid):
+        print line
+
+
+def path_to_word(grid, path):
+    return ''.join([grid[p] for p in path])
+
+
+def display_words(words):
+    print "Found", len(words), "Words"
+    print ", ".join(words)
 
 
 def neighbours_of_position(position):
@@ -17,7 +51,8 @@ def neighbours_of_position(position):
              (x-1, y+1), (x, y+1), (x+1, y+1)
            ]
 
-def get_neighbours(grid):
+
+def all_grid_neighbours(grid):
     neighbours = {}
     for position in grid:
         position_neighbours = neighbours_of_position(position)
@@ -25,15 +60,10 @@ def get_neighbours(grid):
     return neighbours
 
 
-def path_to_word(grid, path):
-    return ''.join([grid[p] for p in path])
+def get_dictionary(dictionary_file):
+    dictionary, stems = set(), set()
 
-
-# TODO, Split loading the file, and building the Dictionary, Stems
-def get_dictionary(dictionaryFile):
-    stems, dictionary = set(), set()
-
-    with open(dictionaryFile) as f:
+    with open(dictionary_file) as f:
         for word in f:
             word = word.strip().upper()
             dictionary.add(word)
@@ -44,9 +74,9 @@ def get_dictionary(dictionaryFile):
     return dictionary, stems
 
 
-def search(grid):
-    neighbours = get_neighbours(grid)
-    dictionary, stems = get_dictionary('/usr/share/dict/words')
+def search(grid, dictionary):
+    word_list, stems = dictionary
+    neighbours = all_grid_neighbours(grid)
 
     paths = []
 
@@ -54,7 +84,7 @@ def search(grid):
         word = path_to_word(grid, path)
         if word not in stems:
             return
-        if word in dictionary:
+        if word in word_list:
             paths.append(path)
         for next_pos in neighbours[path[-1]]:
             if next_pos not in path:
@@ -70,24 +100,4 @@ def search(grid):
     return set(words)
 
 
-def print_grid(grid):
-    s = ''
-    for y in range(10):
-        for x in range(10):
-            s += grid[x, y] + ' '
-        s += '\n'
-    print s
-
-
-def time_function(method):
-    t1 = time.time()
-    res = method()
-    print '%2.2f sec' % (time.time() - t1)
-    return res
-
-
-def get_words():
-    grid = make_grid(10, 10)
-    return search(grid)
-
-# get_words()
+time_function(play_boggle)

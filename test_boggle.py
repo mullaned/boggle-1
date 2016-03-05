@@ -39,11 +39,16 @@ class test_boggle(unittest.TestCase):
         self.assertTrue((2,3) in neighbours)
 
     # All Neighbour Relationships in a Grid
-    def test_all_neighbours(self):
+    def test_all_grid_neighbours(self):
         grid = boggle.make_grid(2, 2)
-        neighbours = boggle.get_neighbours(grid)
+        neighbours = boggle.all_grid_neighbours(grid)
         self.assertEquals(len(neighbours), len(grid))
-        self.assertListEqual(sorted(neighbours[(0, 0)]), sorted([(0, 1), (1, 1), (1, 0)]))
+        others = []
+        for pos in grid:
+            others[:] = grid
+            others.remove(pos)
+            self.assertListEqual(sorted(neighbours[pos]), sorted(others))
+
 
     # Convert a Path to a Word
     def test_converting_a_path_to_a_word(self):
@@ -52,9 +57,3 @@ class test_boggle(unittest.TestCase):
         twoLetterWord = boggle.path_to_word(grid, [(0, 0), (1, 1)])
         self.assertEquals(oneLetterWord, grid[(0, 0)])
         self.assertEquals(twoLetterWord, grid[(0, 0)] + grid[(1, 1)])
-
-
-    def test_search(self):
-        grid = boggle.make_grid(2, 2)
-        words = boggle.search(grid)
-        self.assertEquals(len(words), len(set(words)))
