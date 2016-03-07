@@ -5,7 +5,7 @@ from profile import time_function
 
 
 def play_boggle():
-    grid = make_grid(20, 20)
+    grid = make_grid(4, 4)
     dictionary = get_dictionary('/usr/share/dict/words')
 
     words = search(grid, dictionary)
